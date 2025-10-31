@@ -14,16 +14,198 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      feedbacks: {
+        Row: {
+          category: string | null
+          comments: string
+          created_at: string | null
+          feedback_type: string
+          from_user_id: string
+          id: string
+          rating: number | null
+          to_user_id: string
+        }
+        Insert: {
+          category?: string | null
+          comments: string
+          created_at?: string | null
+          feedback_type: string
+          from_user_id: string
+          id?: string
+          rating?: number | null
+          to_user_id: string
+        }
+        Update: {
+          category?: string | null
+          comments?: string
+          created_at?: string | null
+          feedback_type?: string
+          from_user_id?: string
+          id?: string
+          rating?: number | null
+          to_user_id?: string
+        }
+        Relationships: []
+      }
+      manager_workers: {
+        Row: {
+          assigned_at: string | null
+          id: string
+          manager_id: string
+          worker_id: string
+        }
+        Insert: {
+          assigned_at?: string | null
+          id?: string
+          manager_id: string
+          worker_id: string
+        }
+        Update: {
+          assigned_at?: string | null
+          id?: string
+          manager_id?: string
+          worker_id?: string
+        }
+        Relationships: []
+      }
+      monitoring_logs: {
+        Row: {
+          activity_type: string
+          description: string | null
+          id: string
+          location: string | null
+          logged_at: string | null
+          status: string | null
+          worker_id: string
+        }
+        Insert: {
+          activity_type: string
+          description?: string | null
+          id?: string
+          location?: string | null
+          logged_at?: string | null
+          status?: string | null
+          worker_id: string
+        }
+        Update: {
+          activity_type?: string
+          description?: string | null
+          id?: string
+          location?: string | null
+          logged_at?: string | null
+          status?: string | null
+          worker_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          department: string | null
+          email: string | null
+          factory_id: string | null
+          full_name: string
+          id: string
+          phone: string | null
+          position: string | null
+          skills: string[] | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          department?: string | null
+          email?: string | null
+          factory_id?: string | null
+          full_name: string
+          id: string
+          phone?: string | null
+          position?: string | null
+          skills?: string[] | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          department?: string | null
+          email?: string | null
+          factory_id?: string | null
+          full_name?: string
+          id?: string
+          phone?: string | null
+          position?: string | null
+          skills?: string[] | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      quality_assessments: {
+        Row: {
+          assessed_by: string
+          comments: string | null
+          created_at: string | null
+          date: string
+          efficiency_score: number | null
+          id: string
+          quality_score: number | null
+          work_completed: number | null
+          worker_id: string
+        }
+        Insert: {
+          assessed_by: string
+          comments?: string | null
+          created_at?: string | null
+          date?: string
+          efficiency_score?: number | null
+          id?: string
+          quality_score?: number | null
+          work_completed?: number | null
+          worker_id: string
+        }
+        Update: {
+          assessed_by?: string
+          comments?: string | null
+          created_at?: string | null
+          date?: string
+          efficiency_score?: number | null
+          id?: string
+          quality_score?: number | null
+          work_completed?: number | null
+          worker_id?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "factory_admin" | "manager" | "worker"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +332,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["factory_admin", "manager", "worker"],
+    },
   },
 } as const
