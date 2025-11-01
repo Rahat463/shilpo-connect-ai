@@ -8,6 +8,7 @@ import Worker from "./pages/Worker";
 import Factory from "./pages/Factory";
 import Analytics from "./pages/Analytics";
 import Documentation from "./pages/Documentation";
+import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -20,6 +21,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/auth" element={<Auth />} />
           <Route path="/worker" element={<Worker />} />
           <Route path="/factory" element={<Factory />} />
           <Route path="/analytics" element={<Analytics />} />

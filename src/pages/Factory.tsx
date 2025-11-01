@@ -10,6 +10,7 @@ import {
   Search, Filter, UserPlus, Clock, DollarSign
 } from "lucide-react";
 import factoryImage from "@/assets/factory-interior.jpg";
+import FactoryReports from "@/components/FactoryReports";
 
 const Factory = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -69,10 +70,11 @@ const Factory = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="dashboard">Overview</TabsTrigger>
             <TabsTrigger value="hiring">Hire Workers</TabsTrigger>
             <TabsTrigger value="analytics">Predictive Analytics</TabsTrigger>
+            <TabsTrigger value="reports">Reports</TabsTrigger>
           </TabsList>
 
           <TabsContent value="dashboard" className="space-y-6 animate-fade-in">
@@ -356,6 +358,10 @@ const Factory = () => {
                 </div>
               </div>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="reports" className="space-y-6 animate-fade-in">
+            <FactoryReports />
           </TabsContent>
         </Tabs>
       </div>

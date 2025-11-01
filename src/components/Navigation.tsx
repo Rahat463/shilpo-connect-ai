@@ -1,12 +1,30 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Users, Factory, BarChart3, BookOpen, Menu } from "lucide-react";
-import { useState } from "react";
+import { Users, Factory, BarChart3, BookOpen, Menu, LogOut } from "lucide-react";
+import { useState, useEffect } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const Navigation = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    // Check current session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const navItems = [
     { path: "/", label: "Home", icon: null },
@@ -15,6 +33,18 @@ const Navigation = () => {
     { path: "/analytics", label: "Analytics", icon: BarChart3 },
     { path: "/docs", label: "Documentation", icon: BookOpen },
   ];
+
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      toast.success("Logged out successfully");
+      navigate("/");
+      setOpen(false);
+    } catch (error) {
+      console.error("Logout error:", error);
+      toast.error("Failed to logout");
+    }
+  };
 
   const NavLinks = () => (
     <>
@@ -52,12 +82,21 @@ const Navigation = () => {
         </div>
 
         <div className="hidden md:flex items-center gap-2">
-          <Button variant="outline" asChild>
-            <Link to="/worker">Worker Login</Link>
-          </Button>
-          <Button asChild className="bg-gradient-hero hover:opacity-90">
-            <Link to="/factory">Factory Login</Link>
-          </Button>
+          {user ? (
+            <>
+              <span className="text-sm text-muted-foreground mr-2">
+                {user.email}
+              </span>
+              <Button variant="outline" onClick={handleLogout}>
+                <LogOut className="h-4 w-4 mr-2" />
+                Logout
+              </Button>
+            </>
+          ) : (
+            <Button asChild className="bg-gradient-hero hover:opacity-90">
+              <Link to="/auth">Login / Sign Up</Link>
+            </Button>
+          )}
         </div>
 
         {/* Mobile Navigation */}
@@ -71,12 +110,21 @@ const Navigation = () => {
             <div className="flex flex-col gap-4 mt-8">
               <NavLinks />
               <div className="flex flex-col gap-2 mt-4 pt-4 border-t">
-                <Button variant="outline" asChild onClick={() => setOpen(false)}>
-                  <Link to="/worker">Worker Login</Link>
-                </Button>
-                <Button asChild className="bg-gradient-hero" onClick={() => setOpen(false)}>
-                  <Link to="/factory">Factory Login</Link>
-                </Button>
+                {user ? (
+                  <>
+                    <p className="text-sm text-muted-foreground px-4">
+                      {user.email}
+                    </p>
+                    <Button variant="outline" onClick={handleLogout}>
+                      <LogOut className="h-4 w-4 mr-2" />
+                      Logout
+                    </Button>
+                  </>
+                ) : (
+                  <Button asChild className="bg-gradient-hero" onClick={() => setOpen(false)}>
+                    <Link to="/auth">Login / Sign Up</Link>
+                  </Button>
+                )}
               </div>
             </div>
           </SheetContent>

@@ -12,6 +12,9 @@ import {
   DollarSign, Mic, Video, CheckCircle2, Upload, Search
 } from "lucide-react";
 import workerImage from "@/assets/worker-profile.jpg";
+import WorkerFeedback from "@/components/WorkerFeedback";
+import ManagerDashboard from "@/components/ManagerDashboard";
+import WorkerMonitoring from "@/components/WorkerMonitoring";
 
 const Worker = () => {
   const [activeTab, setActiveTab] = useState("profile");
@@ -62,6 +65,7 @@ const Worker = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
+      <WorkerMonitoring />
       
       <div className="container py-8">
         <div className="mb-8 animate-fade-in">
@@ -131,10 +135,12 @@ const Worker = () => {
           {/* Main Content */}
           <div className="lg:col-span-2">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-              <TabsList className="grid w-full grid-cols-3">
+              <TabsList className="grid w-full grid-cols-5">
                 <TabsTrigger value="profile">Profile</TabsTrigger>
                 <TabsTrigger value="jobs">AI Job Matches</TabsTrigger>
                 <TabsTrigger value="assessment">Skill Assessment</TabsTrigger>
+                <TabsTrigger value="feedback">Feedback</TabsTrigger>
+                <TabsTrigger value="manager">Manager Tools</TabsTrigger>
               </TabsList>
 
               <TabsContent value="profile" className="space-y-6 animate-fade-in">
@@ -298,6 +304,14 @@ const Worker = () => {
                     </div>
                   </div>
                 </Card>
+              </TabsContent>
+
+              <TabsContent value="feedback" className="space-y-6 animate-fade-in">
+                <WorkerFeedback />
+              </TabsContent>
+
+              <TabsContent value="manager" className="space-y-6 animate-fade-in">
+                <ManagerDashboard />
               </TabsContent>
             </Tabs>
           </div>
