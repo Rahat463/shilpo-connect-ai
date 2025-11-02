@@ -45,7 +45,6 @@ const WorkerFeedback = () => {
       setRating(0);
       setCategory("");
     } catch (error) {
-      console.error("Error submitting feedback:", error);
       toast.error("Failed to submit feedback");
     } finally {
       setIsSubmitting(false);

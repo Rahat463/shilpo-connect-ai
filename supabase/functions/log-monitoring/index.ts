@@ -5,6 +5,46 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+// Input validation schema
+const activityTypes = ['Page View', 'Login', 'Logout', 'Task Complete', 'Break'] as const;
+const statusTypes = ['active', 'inactive', 'break'] as const;
+
+function validateInput(data: any): { valid: boolean; error?: string } {
+  if (!data.activity_type || typeof data.activity_type !== 'string') {
+    return { valid: false, error: 'activity_type is required and must be a string' };
+  }
+  
+  if (data.activity_type.length > 100) {
+    return { valid: false, error: 'activity_type must be less than 100 characters' };
+  }
+  
+  if (data.description && typeof data.description !== 'string') {
+    return { valid: false, error: 'description must be a string' };
+  }
+  
+  if (data.description && data.description.length > 500) {
+    return { valid: false, error: 'description must be less than 500 characters' };
+  }
+  
+  if (data.location && typeof data.location !== 'string') {
+    return { valid: false, error: 'location must be a string' };
+  }
+  
+  if (data.location && data.location.length > 200) {
+    return { valid: false, error: 'location must be less than 200 characters' };
+  }
+  
+  if (data.status && typeof data.status !== 'string') {
+    return { valid: false, error: 'status must be a string' };
+  }
+  
+  if (data.status && data.status.length > 50) {
+    return { valid: false, error: 'status must be less than 50 characters' };
+  }
+  
+  return { valid: true };
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
@@ -29,7 +69,18 @@ Deno.serve(async (req) => {
       throw new Error('Invalid authentication')
     }
 
-    const { activity_type, description, location, status } = await req.json()
+    const body = await req.json()
+    
+    // Validate input
+    const validation = validateInput(body);
+    if (!validation.valid) {
+      return new Response(
+        JSON.stringify({ error: validation.error }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
+    const { activity_type, description, location, status } = body;
 
     // Insert monitoring log using service role
     const { error: insertError } = await supabaseClient

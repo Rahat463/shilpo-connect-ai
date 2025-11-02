@@ -8,6 +8,19 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { UserCircle } from "lucide-react";
+import { z } from "zod";
+
+const signupSchema = z.object({
+  email: z.string().trim().email({ message: "Invalid email address" }).max(255),
+  password: z.string().min(8, { message: "Password must be at least 8 characters" }).max(100),
+  fullName: z.string().trim().min(1, { message: "Name is required" }).max(100),
+  phone: z.string().trim().max(20).optional(),
+});
+
+const loginSchema = z.object({
+  email: z.string().trim().email({ message: "Invalid email address" }),
+  password: z.string().min(1, { message: "Password is required" }),
+});
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -39,14 +52,25 @@ const Auth = () => {
     setIsLoading(true);
 
     try {
+      // Validate input
+      const validationResult = signupSchema.safeParse(signupData);
+      if (!validationResult.success) {
+        const firstError = validationResult.error.errors[0];
+        toast.error(firstError.message);
+        setIsLoading(false);
+        return;
+      }
+
+      const validData = validationResult.data;
+
       const { data, error } = await supabase.auth.signUp({
-        email: signupData.email,
-        password: signupData.password,
+        email: validData.email,
+        password: validData.password,
         options: {
           emailRedirectTo: `${window.location.origin}/`,
           data: {
-            full_name: signupData.fullName,
-            phone: signupData.phone,
+            full_name: validData.fullName,
+            phone: validData.phone || null,
           }
         }
       });
@@ -59,9 +83,9 @@ const Auth = () => {
           .from("profiles")
           .insert({
             id: data.user.id,
-            full_name: signupData.fullName,
-            email: signupData.email,
-            phone: signupData.phone,
+            full_name: validData.fullName,
+            email: validData.email,
+            phone: validData.phone || null,
           });
 
         if (profileError) throw profileError;
@@ -80,7 +104,6 @@ const Auth = () => {
         navigate("/");
       }
     } catch (error: any) {
-      console.error("Signup error:", error);
       toast.error(error.message || "Failed to create account");
     } finally {
       setIsLoading(false);
@@ -92,9 +115,20 @@ const Auth = () => {
     setIsLoading(true);
 
     try {
+      // Validate input
+      const validationResult = loginSchema.safeParse(loginData);
+      if (!validationResult.success) {
+        const firstError = validationResult.error.errors[0];
+        toast.error(firstError.message);
+        setIsLoading(false);
+        return;
+      }
+
+      const validData = validationResult.data;
+
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: loginData.email,
-        password: loginData.password,
+        email: validData.email,
+        password: validData.password,
       });
 
       if (error) throw error;
@@ -104,7 +138,6 @@ const Auth = () => {
         navigate("/");
       }
     } catch (error: any) {
-      console.error("Login error:", error);
       toast.error(error.message || "Failed to login");
     } finally {
       setIsLoading(false);

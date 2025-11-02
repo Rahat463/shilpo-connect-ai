@@ -53,7 +53,7 @@ const ManagerDashboard = () => {
 
       setWorkers(workersList);
     } catch (error) {
-      console.error("Error fetching workers:", error);
+      toast.error("Failed to load workers");
     }
   };
 
@@ -86,7 +86,6 @@ const ManagerDashboard = () => {
       setRating(0);
       setSelectedWorker("");
     } catch (error) {
-      console.error("Error submitting feedback:", error);
       toast.error("Failed to submit feedback");
     }
   };
@@ -121,7 +120,6 @@ const ManagerDashboard = () => {
       setWorkCompleted("");
       setComments("");
     } catch (error) {
-      console.error("Error submitting assessment:", error);
       toast.error("Failed to submit assessment");
     }
   };
