@@ -5,16 +5,29 @@ const WorkerMonitoring = () => {
   useEffect(() => {
     const logActivity = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) return;
 
-        // Log worker activity
-        await supabase.from("monitoring_logs").insert({
-          worker_id: user.id,
-          activity_type: "Page View",
-          description: `Visited ${window.location.pathname}`,
-          status: "active",
-        });
+        // Log worker activity via edge function
+        const response = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/log-monitoring`,
+          {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${session.access_token}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              activity_type: "Page View",
+              description: `Visited ${window.location.pathname}`,
+              status: "active",
+            }),
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error('Failed to log activity');
+        }
       } catch (error) {
         console.error("Error logging activity:", error);
       }
