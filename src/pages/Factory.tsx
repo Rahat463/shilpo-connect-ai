@@ -1,9 +1,10 @@
 import { useState } from "react";
 import Navigation from "@/components/Navigation";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { FactorySidebar } from "@/components/FactorySidebar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { 
   Users, TrendingUp, AlertCircle, CheckCircle2, 
@@ -11,6 +12,8 @@ import {
 } from "lucide-react";
 import factoryImage from "@/assets/factory-interior.jpg";
 import FactoryReports from "@/components/FactoryReports";
+import Inbox from "@/components/Inbox";
+import JobPosting from "@/components/JobPosting";
 
 const Factory = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -61,23 +64,21 @@ const Factory = () => {
     <div className="min-h-screen bg-background">
       <Navigation />
       
-      <div className="container py-8">
-        <div className="mb-8 animate-fade-in">
-          <h1 className="text-4xl font-bold mb-2">Factory Dashboard</h1>
-          <p className="text-muted-foreground">
-            AI-powered workforce management and hiring platform
-          </p>
-        </div>
+      <SidebarProvider>
+        <div className="flex min-h-screen w-full">
+          <FactorySidebar activeTab={activeTab} onTabChange={setActiveTab} />
+          
+          <main className="flex-1">
+            <div className="container py-8">
+              <div className="mb-8 animate-fade-in">
+                <h1 className="text-4xl font-bold mb-2">Factory Dashboard</h1>
+                <p className="text-muted-foreground">
+                  AI-powered workforce management and hiring platform
+                </p>
+              </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="dashboard">Overview</TabsTrigger>
-            <TabsTrigger value="hiring">Hire Workers</TabsTrigger>
-            <TabsTrigger value="analytics">Predictive Analytics</TabsTrigger>
-            <TabsTrigger value="reports">Reports</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="dashboard" className="space-y-6 animate-fade-in">
+              {activeTab === "dashboard" && (
+                <div className="space-y-6 animate-fade-in">
             {/* Stats Cards */}
             <div className="grid md:grid-cols-4 gap-6">
               <Card className="p-6 shadow-soft">
@@ -204,9 +205,11 @@ const Factory = () => {
                 View All Alerts
               </Button>
             </Card>
-          </TabsContent>
+                </div>
+              )}
 
-          <TabsContent value="hiring" className="space-y-6 animate-fade-in">
+              {activeTab === "hiring" && (
+                <div className="space-y-6 animate-fade-in">
             <Card className="p-6 shadow-soft">
               <div className="flex items-center gap-4 mb-6">
                 <div className="relative flex-1">
@@ -271,9 +274,11 @@ const Factory = () => {
                 </Card>
               ))}
             </div>
-          </TabsContent>
+                </div>
+              )}
 
-          <TabsContent value="analytics" className="space-y-6 animate-fade-in">
+              {activeTab === "analytics" && (
+                <div className="space-y-6 animate-fade-in">
             <div className="grid md:grid-cols-2 gap-6">
               <Card className="p-6 shadow-soft">
                 <h3 className="text-lg font-semibold mb-4">Attrition Prediction</h3>
@@ -358,13 +363,16 @@ const Factory = () => {
                 </div>
               </div>
             </Card>
-          </TabsContent>
+                </div>
+              )}
 
-          <TabsContent value="reports" className="space-y-6 animate-fade-in">
-            <FactoryReports />
-          </TabsContent>
-        </Tabs>
-      </div>
+              {activeTab === "reports" && <FactoryReports />}
+              {activeTab === "inbox" && <Inbox />}
+              {activeTab === "jobs" && <JobPosting />}
+            </div>
+          </main>
+        </div>
+      </SidebarProvider>
     </div>
   );
 };

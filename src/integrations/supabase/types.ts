@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      document_embeddings: {
+        Row: {
+          content: string
+          created_at: string
+          document_type: string
+          embedding: string | null
+          id: string
+          metadata: Json | null
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          document_type: string
+          embedding?: string | null
+          id?: string
+          metadata?: Json | null
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          document_type?: string
+          embedding?: string | null
+          id?: string
+          metadata?: Json | null
+        }
+        Relationships: []
+      }
       feedbacks: {
         Row: {
           category: string | null
@@ -47,6 +74,56 @@ export type Database = {
         }
         Relationships: []
       }
+      job_posts: {
+        Row: {
+          created_at: string
+          description: string
+          employment_type: string | null
+          factory_id: string
+          id: string
+          location: string | null
+          requirements: Json | null
+          salary_range: string | null
+          status: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          employment_type?: string | null
+          factory_id: string
+          id?: string
+          location?: string | null
+          requirements?: Json | null
+          salary_range?: string | null
+          status?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          employment_type?: string | null
+          factory_id?: string
+          id?: string
+          location?: string | null
+          requirements?: Json | null
+          salary_range?: string | null
+          status?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_posts_factory_id_fkey"
+            columns: ["factory_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       manager_workers: {
         Row: {
           assigned_at: string | null
@@ -67,6 +144,54 @@ export type Database = {
           worker_id?: string
         }
         Relationships: []
+      }
+      messages: {
+        Row: {
+          content: string
+          conversation_id: string | null
+          created_at: string
+          id: string
+          read: boolean | null
+          receiver_id: string
+          sender_id: string
+          subject: string | null
+        }
+        Insert: {
+          content: string
+          conversation_id?: string | null
+          created_at?: string
+          id?: string
+          read?: boolean | null
+          receiver_id: string
+          sender_id: string
+          subject?: string | null
+        }
+        Update: {
+          content?: string
+          conversation_id?: string | null
+          created_at?: string
+          id?: string
+          read?: boolean | null
+          receiver_id?: string
+          sender_id?: string
+          subject?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_receiver_id_fkey"
+            columns: ["receiver_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       monitoring_logs: {
         Row: {
@@ -100,40 +225,70 @@ export type Database = {
       }
       profiles: {
         Row: {
+          address: string | null
+          availability: string | null
+          certifications: Json | null
           created_at: string | null
+          date_of_birth: string | null
           department: string | null
+          education: string | null
           email: string | null
           factory_id: string | null
           full_name: string
           id: string
+          national_id: string | null
           phone: string | null
           position: string | null
+          preferred_salary_max: number | null
+          preferred_salary_min: number | null
+          profile_visibility: string | null
           skills: string[] | null
           updated_at: string | null
+          work_history: Json | null
         }
         Insert: {
+          address?: string | null
+          availability?: string | null
+          certifications?: Json | null
           created_at?: string | null
+          date_of_birth?: string | null
           department?: string | null
+          education?: string | null
           email?: string | null
           factory_id?: string | null
           full_name: string
           id: string
+          national_id?: string | null
           phone?: string | null
           position?: string | null
+          preferred_salary_max?: number | null
+          preferred_salary_min?: number | null
+          profile_visibility?: string | null
           skills?: string[] | null
           updated_at?: string | null
+          work_history?: Json | null
         }
         Update: {
+          address?: string | null
+          availability?: string | null
+          certifications?: Json | null
           created_at?: string | null
+          date_of_birth?: string | null
           department?: string | null
+          education?: string | null
           email?: string | null
           factory_id?: string | null
           full_name?: string
           id?: string
+          national_id?: string | null
           phone?: string | null
           position?: string | null
+          preferred_salary_max?: number | null
+          preferred_salary_min?: number | null
+          profile_visibility?: string | null
           skills?: string[] | null
           updated_at?: string | null
+          work_history?: Json | null
         }
         Relationships: []
       }
@@ -190,6 +345,102 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      video_call_sessions: {
+        Row: {
+          created_at: string
+          ended_at: string | null
+          factory_id: string
+          id: string
+          room_id: string
+          scheduled_at: string | null
+          started_at: string | null
+          status: string | null
+          worker_id: string
+        }
+        Insert: {
+          created_at?: string
+          ended_at?: string | null
+          factory_id: string
+          id?: string
+          room_id: string
+          scheduled_at?: string | null
+          started_at?: string | null
+          status?: string | null
+          worker_id: string
+        }
+        Update: {
+          created_at?: string
+          ended_at?: string | null
+          factory_id?: string
+          id?: string
+          room_id?: string
+          scheduled_at?: string | null
+          started_at?: string | null
+          status?: string | null
+          worker_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_call_sessions_factory_id_fkey"
+            columns: ["factory_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "video_call_sessions_worker_id_fkey"
+            columns: ["worker_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      worker_references: {
+        Row: {
+          created_at: string
+          factory_id: string
+          id: string
+          rating: number | null
+          reference_text: string
+          verified: boolean | null
+          worker_id: string
+        }
+        Insert: {
+          created_at?: string
+          factory_id: string
+          id?: string
+          rating?: number | null
+          reference_text: string
+          verified?: boolean | null
+          worker_id: string
+        }
+        Update: {
+          created_at?: string
+          factory_id?: string
+          id?: string
+          rating?: number | null
+          reference_text?: string
+          verified?: boolean | null
+          worker_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "worker_references_factory_id_fkey"
+            columns: ["factory_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "worker_references_worker_id_fkey"
+            columns: ["worker_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

@@ -295,20 +295,15 @@ const Documentation = () => {
         <Card className="p-8 text-center shadow-strong bg-gradient-card animate-fade-in">
           <h2 className="text-2xl font-bold mb-4">Ready to Learn More?</h2>
           <p className="text-muted-foreground mb-6">
-            Explore our prototype and see how AI transforms workforce management
+            Explore our prototype and see how AI transforms workforce management in Bangladesh's garment industry
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <Button asChild className="bg-gradient-hero hover:opacity-90">
-              <a href="https://github.com" target="_blank" rel="noopener noreferrer">
-                <ExternalLink className="mr-2 h-4 w-4" />
-                View on GitHub
-              </a>
+            <Button className="bg-gradient-hero hover:opacity-90">
+              <ExternalLink className="mr-2 h-4 w-4" />
+              View Demo
             </Button>
-            <Button variant="outline" asChild>
-              <a href="https://drive.google.com" target="_blank" rel="noopener noreferrer">
-                <ExternalLink className="mr-2 h-4 w-4" />
-                Download Pitch Deck
-              </a>
+            <Button variant="outline">
+              Contact Us
             </Button>
           </div>
         </Card>
