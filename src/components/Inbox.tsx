@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Mail, Send, Trash2, Video } from "lucide-react";
+import { Mail, Send, Trash2, Video, Mic, Square, Play, Pause } from "lucide-react";
 import { format } from "date-fns";
 
 interface Message {
@@ -30,6 +30,12 @@ export default function Inbox() {
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const [newMessage, setNewMessage] = useState({ to: "", subject: "", content: "" });
   const [loading, setLoading] = useState(true);
+  const [isRecording, setIsRecording] = useState(false);
+  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     fetchMessages();
@@ -83,6 +89,60 @@ export default function Inbox() {
     }
   };
 
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+
+      mediaRecorder.onstop = () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        setAudioBlob(audioBlob);
+        stream.getTracks().forEach(track => track.stop());
+      };
+
+      mediaRecorder.start();
+      setIsRecording(true);
+      toast.success("Recording started");
+    } catch (error) {
+      toast.error("Failed to start recording");
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+      toast.success("Recording stopped");
+    }
+  };
+
+  const playAudio = () => {
+    if (audioBlob) {
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
+      audioRef.current = audio;
+      
+      audio.onended = () => setIsPlaying(false);
+      audio.play();
+      setIsPlaying(true);
+    }
+  };
+
+  const pauseAudio = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    }
+  };
+
   const sendMessage = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -100,19 +160,32 @@ export default function Inbox() {
         return;
       }
 
+      let messageContent = newMessage.content;
+
+      // If there's a voice message, convert to base64 and prepend
+      if (audioBlob) {
+        const reader = new FileReader();
+        const base64Audio = await new Promise<string>((resolve) => {
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.readAsDataURL(audioBlob);
+        });
+        messageContent = `[VOICE_MESSAGE]${base64Audio}\n\n${newMessage.content}`;
+      }
+
       const { error } = await supabase
         .from("messages")
         .insert({
           sender_id: user.id,
           receiver_id: receiver.id,
           subject: newMessage.subject,
-          content: newMessage.content
+          content: messageContent
         });
 
       if (error) throw error;
 
       toast.success("Message sent successfully");
       setNewMessage({ to: "", subject: "", content: "" });
+      setAudioBlob(null);
     } catch (error) {
       toast.error("Failed to send message");
     }
@@ -166,6 +239,61 @@ export default function Inbox() {
                   rows={5}
                 />
               </div>
+              
+              {/* Voice Message Controls */}
+              <div className="space-y-2">
+                <Label>Voice Message (Optional)</Label>
+                <div className="flex gap-2">
+                  {!isRecording && !audioBlob && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={startRecording}
+                      className="flex-1"
+                    >
+                      <Mic className="mr-2 h-4 w-4" />
+                      Record Voice Message
+                    </Button>
+                  )}
+                  
+                  {isRecording && (
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      onClick={stopRecording}
+                      className="flex-1"
+                    >
+                      <Square className="mr-2 h-4 w-4" />
+                      Stop Recording
+                    </Button>
+                  )}
+                  
+                  {audioBlob && !isRecording && (
+                    <>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={isPlaying ? pauseAudio : playAudio}
+                        className="flex-1"
+                      >
+                        {isPlaying ? (
+                          <><Pause className="mr-2 h-4 w-4" />Pause</>
+                        ) : (
+                          <><Play className="mr-2 h-4 w-4" />Play</>
+                        )}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        onClick={() => setAudioBlob(null)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </>
+                  )}
+                </div>
+              </div>
+              
               <Button onClick={sendMessage} className="w-full">Send Message</Button>
             </div>
           </DialogContent>

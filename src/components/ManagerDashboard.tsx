@@ -1,297 +1,175 @@
-import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Users, Star, TrendingUp } from "lucide-react";
-import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { Progress } from "@/components/ui/progress";
+import { 
+  Users, TrendingUp, AlertTriangle, CheckCircle2, 
+  UserCheck, Clock, Target, BarChart3 
+} from "lucide-react";
 
-interface Worker {
-  id: string;
-  full_name: string;
-  position: string;
-  department: string;
-}
-
-const ManagerDashboard = () => {
-  const [workers, setWorkers] = useState<Worker[]>([]);
-  const [selectedWorker, setSelectedWorker] = useState<string>("");
-  const [rating, setRating] = useState(0);
-  const [comments, setComments] = useState("");
-  const [qualityScore, setQualityScore] = useState("");
-  const [efficiencyScore, setEfficiencyScore] = useState("");
-  const [workCompleted, setWorkCompleted] = useState("");
-
-  useEffect(() => {
-    fetchMyWorkers();
-  }, []);
-
-  const fetchMyWorkers = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const { data, error } = await supabase
-        .from("manager_workers")
-        .select(`
-          worker_id,
-          profiles!manager_workers_worker_id_fkey(id, full_name, position, department)
-        `)
-        .eq("manager_id", user.id);
-
-      if (error) throw error;
-
-      const workersList = data?.map((item: any) => ({
-        id: item.profiles.id,
-        full_name: item.profiles.full_name,
-        position: item.profiles.position,
-        department: item.profiles.department
-      })) || [];
-
-      setWorkers(workersList);
-    } catch (error) {
-      toast.error("Failed to load workers");
-    }
+export default function ManagerDashboard() {
+  const teamMetrics = {
+    totalWorkers: 45,
+    activeToday: 42,
+    onLeave: 3,
+    productivity: 87,
+    qualityScore: 92
   };
 
-  const handleSubmitFeedback = async () => {
-    if (!selectedWorker || !comments.trim() || rating === 0) {
-      toast.error("Please select a worker, provide rating and comments");
-      return;
-    }
+  const workerPerformance = [
+    { name: "Fatema Begum", role: "Senior Operator", productivity: 95, quality: 98, status: "excellent" },
+    { name: "Rahima Khatun", role: "Machine Operator", productivity: 88, quality: 90, status: "good" },
+    { name: "Sultana Akter", role: "Quality Inspector", productivity: 82, quality: 95, status: "good" },
+    { name: "Ayesha Rahman", role: "Junior Operator", productivity: 65, quality: 70, status: "needs-attention" }
+  ];
 
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        toast.error("Please login to submit feedback");
-        return;
-      }
-
-      const { error } = await supabase.from("feedbacks").insert({
-        from_user_id: user.id,
-        to_user_id: selectedWorker,
-        feedback_type: "manager_to_worker",
-        rating,
-        comments,
-        category: "Manager Feedback"
-      });
-
-      if (error) throw error;
-
-      toast.success("Feedback submitted successfully");
-      setComments("");
-      setRating(0);
-      setSelectedWorker("");
-    } catch (error) {
-      toast.error("Failed to submit feedback");
-    }
-  };
-
-  const handleSubmitQualityAssessment = async () => {
-    if (!selectedWorker || !qualityScore || !efficiencyScore) {
-      toast.error("Please fill all quality assessment fields");
-      return;
-    }
-
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        toast.error("Please login to submit assessment");
-        return;
-      }
-
-      const { error } = await supabase.from("quality_assessments").insert({
-        worker_id: selectedWorker,
-        assessed_by: user.id,
-        work_completed: parseInt(workCompleted) || 0,
-        quality_score: parseInt(qualityScore),
-        efficiency_score: parseInt(efficiencyScore),
-        comments
-      });
-
-      if (error) throw error;
-
-      toast.success("Quality assessment submitted successfully");
-      setQualityScore("");
-      setEfficiencyScore("");
-      setWorkCompleted("");
-      setComments("");
-    } catch (error) {
-      toast.error("Failed to submit assessment");
-    }
-  };
+  const pendingTasks = [
+    { title: "Approve leave requests", count: 3, urgent: true },
+    { title: "Review quality assessments", count: 7, urgent: false },
+    { title: "Schedule team meetings", count: 2, urgent: true },
+    { title: "Process feedback forms", count: 5, urgent: false }
+  ];
 
   return (
-    <div className="space-y-6">
-      <Card className="p-6 shadow-soft">
-        <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
-          <Users className="h-5 w-5 text-primary" />
-          My Team
-        </h3>
-        
-        {workers.length === 0 ? (
-          <p className="text-muted-foreground">No workers assigned yet</p>
-        ) : (
-          <div className="grid md:grid-cols-2 gap-4">
-            {workers.map((worker) => (
-              <Card key={worker.id} className="p-4">
-                <h4 className="font-semibold">{worker.full_name}</h4>
-                <p className="text-sm text-muted-foreground">{worker.position}</p>
-                <Badge variant="outline" className="mt-2">{worker.department}</Badge>
-              </Card>
+    <div className="space-y-6 animate-fade-in">
+      <div>
+        <h2 className="text-3xl font-bold mb-2">Manager Dashboard</h2>
+        <p className="text-muted-foreground">Team management and performance overview</p>
+      </div>
+
+      {/* Key Metrics */}
+      <div className="grid md:grid-cols-5 gap-4">
+        <Card className="p-4 shadow-soft">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm text-muted-foreground">Total Team</span>
+            <Users className="h-4 w-4 text-primary" />
+          </div>
+          <div className="text-2xl font-bold">{teamMetrics.totalWorkers}</div>
+        </Card>
+
+        <Card className="p-4 shadow-soft">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm text-muted-foreground">Active Today</span>
+            <UserCheck className="h-4 w-4 text-secondary" />
+          </div>
+          <div className="text-2xl font-bold">{teamMetrics.activeToday}</div>
+        </Card>
+
+        <Card className="p-4 shadow-soft">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm text-muted-foreground">On Leave</span>
+            <Clock className="h-4 w-4 text-accent" />
+          </div>
+          <div className="text-2xl font-bold">{teamMetrics.onLeave}</div>
+        </Card>
+
+        <Card className="p-4 shadow-soft">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm text-muted-foreground">Productivity</span>
+            <Target className="h-4 w-4 text-primary" />
+          </div>
+          <div className="text-2xl font-bold">{teamMetrics.productivity}%</div>
+        </Card>
+
+        <Card className="p-4 shadow-soft">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm text-muted-foreground">Quality Score</span>
+            <BarChart3 className="h-4 w-4 text-secondary" />
+          </div>
+          <div className="text-2xl font-bold">{teamMetrics.qualityScore}%</div>
+        </Card>
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-6">
+        {/* Team Performance */}
+        <Card className="p-6 shadow-soft">
+          <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
+            <TrendingUp className="h-5 w-5 text-primary" />
+            Team Performance
+          </h3>
+          <div className="space-y-4">
+            {workerPerformance.map((worker) => (
+              <div key={worker.name} className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="font-medium">{worker.name}</p>
+                    <p className="text-sm text-muted-foreground">{worker.role}</p>
+                  </div>
+                  <Badge 
+                    variant={worker.status === "excellent" ? "default" : worker.status === "good" ? "secondary" : "destructive"}
+                  >
+                    {worker.status === "excellent" ? "Excellent" : worker.status === "good" ? "Good" : "Needs Attention"}
+                  </Badge>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <div className="flex justify-between text-xs mb-1">
+                      <span>Productivity</span>
+                      <span>{worker.productivity}%</span>
+                    </div>
+                    <Progress value={worker.productivity} className="h-2" />
+                  </div>
+                  <div>
+                    <div className="flex justify-between text-xs mb-1">
+                      <span>Quality</span>
+                      <span>{worker.quality}%</span>
+                    </div>
+                    <Progress value={worker.quality} className="h-2" />
+                  </div>
+                </div>
+              </div>
             ))}
           </div>
-        )}
-      </Card>
+        </Card>
 
+        {/* Pending Tasks */}
+        <Card className="p-6 shadow-soft">
+          <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
+            <CheckCircle2 className="h-5 w-5 text-primary" />
+            Pending Tasks
+          </h3>
+          <div className="space-y-3">
+            {pendingTasks.map((task) => (
+              <div 
+                key={task.title}
+                className="flex items-center justify-between p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  {task.urgent && <AlertTriangle className="h-4 w-4 text-destructive" />}
+                  <div>
+                    <p className="font-medium">{task.title}</p>
+                    <p className="text-sm text-muted-foreground">{task.count} pending</p>
+                  </div>
+                </div>
+                <Button size="sm" variant="outline">Review</Button>
+              </div>
+            ))}
+          </div>
+        </Card>
+      </div>
+
+      {/* Quick Actions */}
       <Card className="p-6 shadow-soft">
-        <h3 className="text-xl font-semibold mb-4">Give Feedback to Worker</h3>
-        
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label>Select Worker</Label>
-            <select
-              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
-              value={selectedWorker}
-              onChange={(e) => setSelectedWorker(e.target.value)}
-            >
-              <option value="">Choose a worker...</option>
-              {workers.map((worker) => (
-                <option key={worker.id} value={worker.id}>
-                  {worker.full_name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="space-y-2">
-            <Label>Performance Rating</Label>
-            <div className="flex gap-2">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <button
-                  key={star}
-                  type="button"
-                  onClick={() => setRating(star)}
-                  className="transition-transform hover:scale-110"
-                >
-                  <Star
-                    className={`h-8 w-8 ${
-                      star <= rating
-                        ? "fill-yellow-500 text-yellow-500"
-                        : "text-muted-foreground"
-                    }`}
-                  />
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="feedback-comments">Feedback Comments</Label>
-            <Textarea
-              id="feedback-comments"
-              placeholder="Provide constructive feedback..."
-              value={comments}
-              onChange={(e) => setComments(e.target.value)}
-              rows={4}
-            />
-          </div>
-
-          <Button 
-            className="w-full bg-gradient-hero" 
-            onClick={handleSubmitFeedback}
-          >
-            Submit Feedback
+        <h3 className="text-xl font-semibold mb-4">Quick Actions</h3>
+        <div className="grid md:grid-cols-4 gap-3">
+          <Button variant="outline" className="w-full">
+            <Users className="mr-2 h-4 w-4" />
+            Assign Workers
           </Button>
-        </div>
-      </Card>
-
-      <Card className="p-6 shadow-soft">
-        <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
-          <TrendingUp className="h-5 w-5 text-primary" />
-          Quality Assessment
-        </h3>
-        
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label>Select Worker</Label>
-            <select
-              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
-              value={selectedWorker}
-              onChange={(e) => setSelectedWorker(e.target.value)}
-            >
-              <option value="">Choose a worker...</option>
-              {workers.map((worker) => (
-                <option key={worker.id} value={worker.id}>
-                  {worker.full_name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="work-completed">Work Completed (units)</Label>
-              <Input
-                id="work-completed"
-                type="number"
-                placeholder="e.g., 50"
-                value={workCompleted}
-                onChange={(e) => setWorkCompleted(e.target.value)}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="quality-score">Quality Score (1-10)</Label>
-              <Input
-                id="quality-score"
-                type="number"
-                min="1"
-                max="10"
-                placeholder="1-10"
-                value={qualityScore}
-                onChange={(e) => setQualityScore(e.target.value)}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="efficiency-score">Efficiency Score (1-10)</Label>
-              <Input
-                id="efficiency-score"
-                type="number"
-                min="1"
-                max="10"
-                placeholder="1-10"
-                value={efficiencyScore}
-                onChange={(e) => setEfficiencyScore(e.target.value)}
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="assessment-comments">Assessment Notes</Label>
-            <Textarea
-              id="assessment-comments"
-              placeholder="Additional notes about today's work..."
-              value={comments}
-              onChange={(e) => setComments(e.target.value)}
-              rows={3}
-            />
-          </div>
-
-          <Button 
-            className="w-full bg-gradient-hero" 
-            onClick={handleSubmitQualityAssessment}
-          >
-            Submit Quality Assessment
+          <Button variant="outline" className="w-full">
+            <Target className="mr-2 h-4 w-4" />
+            Set Goals
+          </Button>
+          <Button variant="outline" className="w-full">
+            <BarChart3 className="mr-2 h-4 w-4" />
+            Generate Report
+          </Button>
+          <Button variant="outline" className="w-full">
+            <CheckCircle2 className="mr-2 h-4 w-4" />
+            Create Assessment
           </Button>
         </div>
       </Card>
     </div>
   );
-};
-
-export default ManagerDashboard;
+}

@@ -15,6 +15,7 @@ import FactoryReports from "@/components/FactoryReports";
 import Inbox from "@/components/Inbox";
 import JobPosting from "@/components/JobPosting";
 import FloatingChatButton from "@/components/FloatingChatButton";
+import ManagerDashboard from "@/components/ManagerDashboard";
 
 const Factory = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -367,6 +368,7 @@ const Factory = () => {
                 </div>
               )}
 
+              {activeTab === "manager" && <ManagerDashboard />}
               {activeTab === "reports" && <FactoryReports />}
               {activeTab === "inbox" && <Inbox />}
               {activeTab === "jobs" && <JobPosting />}
