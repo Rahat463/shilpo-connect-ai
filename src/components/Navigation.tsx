@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Users, Factory, BarChart3, BookOpen, Menu, LogOut } from "lucide-react";
+import { Users, Factory, BarChart3, Menu, LogOut } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { supabase } from "@/integrations/supabase/client";
@@ -29,9 +29,9 @@ const Navigation = () => {
   const navItems = [
     { path: "/", label: "Home", icon: null },
     { path: "/worker", label: "Workers", icon: Users },
+    { path: "/manager", label: "Managers", icon: Users },
     { path: "/factory", label: "Factories", icon: Factory },
     { path: "/analytics", label: "Analytics", icon: BarChart3 },
-    { path: "/docs", label: "Documentation", icon: BookOpen },
   ];
 
   const handleLogout = async () => {

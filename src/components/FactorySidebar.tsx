@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { LayoutDashboard, Mail, Users, Briefcase, BarChart3, FileText, Target } from "lucide-react";
+import { LayoutDashboard, Mail, Users, Briefcase, BarChart3, FileText } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -20,7 +20,6 @@ interface FactorySidebarProps {
 
 const menuItems = [
   { id: "dashboard", label: "Overview", icon: LayoutDashboard },
-  { id: "manager", label: "Manager Tools", icon: Target },
   { id: "inbox", label: "Inbox", icon: Mail },
   { id: "hiring", label: "Hire Workers", icon: Users },
   { id: "jobs", label: "Job Posts", icon: Briefcase },
