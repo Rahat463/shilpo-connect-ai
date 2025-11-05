@@ -14,6 +14,7 @@ import factoryImage from "@/assets/factory-interior.jpg";
 import FactoryReports from "@/components/FactoryReports";
 import Inbox from "@/components/Inbox";
 import JobPosting from "@/components/JobPosting";
+import FloatingChatButton from "@/components/FloatingChatButton";
 
 const Factory = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -373,6 +374,7 @@ const Factory = () => {
           </main>
         </div>
       </SidebarProvider>
+      <FloatingChatButton />
     </div>
   );
 };

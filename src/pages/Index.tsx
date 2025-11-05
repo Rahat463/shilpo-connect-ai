@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Navigation from "@/components/Navigation";
+import FloatingChatButton from "@/components/FloatingChatButton";
 import { Brain, Users, TrendingUp, Shield, Smartphone, Award, CheckCircle2, ArrowRight } from "lucide-react";
 import heroImage from "@/assets/hero-workers.jpg";
 import aiMatchingImage from "@/assets/ai-matching.jpg";
@@ -59,6 +60,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
+      <FloatingChatButton />
       
       {/* Hero Section */}
       <section className="relative overflow-hidden">

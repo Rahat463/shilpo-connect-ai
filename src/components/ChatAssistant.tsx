@@ -66,8 +66,8 @@ export default function ChatAssistant() {
   };
 
   return (
-    <Card className="flex flex-col h-[600px] shadow-soft">
-      <div className="p-4 border-b">
+    <div className="flex flex-col h-full">
+      <div className="p-4 border-b bg-background">
         <h3 className="font-semibold flex items-center gap-2">
           <Bot className="h-5 w-5 text-primary" />
           AI Assistant
@@ -134,6 +134,6 @@ export default function ChatAssistant() {
           </Button>
         </div>
       </div>
-    </Card>
+    </div>
   );
 }

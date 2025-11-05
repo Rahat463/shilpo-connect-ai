@@ -19,7 +19,7 @@ import ManagerDashboard from "@/components/ManagerDashboard";
 import WorkerMonitoring from "@/components/WorkerMonitoring";
 import Inbox from "@/components/Inbox";
 import WorkerReferences from "@/components/WorkerReferences";
-import ChatAssistant from "@/components/ChatAssistant";
+import FloatingChatButton from "@/components/FloatingChatButton";
 
 const Worker = () => {
   const [activeTab, setActiveTab] = useState("profile");
@@ -140,8 +140,6 @@ const Worker = () => {
                       </div>
                     </div>
                   </Card>
-
-                  <ChatAssistant />
                 </div>
 
                 {/* Main Content */}
@@ -321,6 +319,7 @@ const Worker = () => {
           </main>
         </div>
       </SidebarProvider>
+      <FloatingChatButton />
     </div>
   );
 };
